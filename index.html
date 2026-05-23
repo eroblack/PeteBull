@@ -3,58 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Eroblack Ball Betting</title>
+    <title>Eroblack Ball Betting - Hard Mode</title>
     <style>
-        :root { --accent: #ffd700; --bg: #050a14; }
+        :root { --accent: #ff3300; --bg: #050505; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
-            background: var(--bg); color: white; font-family: sans-serif; 
+            background: var(--bg); color: white; font-family: 'Arial Black', sans-serif; 
             margin: 0; display: flex; flex-direction: column; align-items: center; 
             height: 100vh; overflow: hidden;
         }
 
         /* --- UI TOP --- */
-        #top-bar { width: 100%; padding: 15px; display: flex; justify-content: space-around; background: #111; border-bottom: 2px solid #333; }
+        #top-bar { width: 100%; padding: 15px; display: flex; justify-content: space-around; background: #111; border-bottom: 3px solid #ff3300; box-shadow: 0 5px 15px rgba(255, 51, 0, 0.3); }
         .stat-box { text-align: center; }
-        .label { font-size: 10px; color: var(--accent); text-transform: uppercase; }
-        .val { font-size: 18px; font-weight: bold; }
+        .label { font-size: 10px; color: var(--accent); letter-spacing: 1px; }
+        .val { font-size: 20px; font-weight: 900; }
 
         /* --- TIMER BAR --- */
-        #timer-cont { width: 90%; height: 8px; background: #222; margin: 15px 0; border-radius: 10px; overflow: hidden; }
-        #timer-bar { width: 100%; height: 100%; background: linear-gradient(to right, #00ff00, #ff0000); transition: 0.1s; }
+        #timer-cont { width: 90%; height: 12px; background: #222; margin: 20px 0; border-radius: 20px; border: 1px solid #444; overflow: hidden; }
+        #timer-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #00ff00, #ffcc00, #ff0000); transition: 0.1s linear; }
 
         /* --- GAME BOARD --- */
-        #game-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px; }
+        #game-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 10px; perspective: 500px; }
         .tube {
-            width: 50px; height: 160px; border: 3px solid rgba(255,255,255,0.2);
-            border-top: none; border-radius: 0 0 25px 25px;
+            width: 55px; height: 175px; border: 3px solid rgba(255,255,255,0.15);
+            border-top: none; border-radius: 0 0 30px 30px;
             display: flex; flex-direction: column-reverse; align-items: center;
-            padding-bottom: 8px; cursor: pointer; transition: 0.2s;
+            padding-bottom: 10px; cursor: pointer; transition: 0.2s;
+            background: linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.01));
         }
-        .tube.selected { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 15px var(--accent); }
-        .ball { width: 38px; height: 38px; border-radius: 50%; margin-bottom: 2px; box-shadow: inset -4px -4px 8px rgba(0,0,0,0.5); }
+        .tube.selected { border-color: var(--accent); transform: translateY(-10px); box-shadow: 0 10px 20px rgba(255, 51, 0, 0.4); }
+        .ball { width: 44px; height: 44px; border-radius: 50%; margin-bottom: 3px; position: relative; }
+        
+        /* 3D Ball Effect */
+        .ball::after {
+            content: ''; position: absolute; top: 5px; left: 8px; width: 12px; height: 12px;
+            background: rgba(255,255,255,0.4); border-radius: 50%; filter: blur(2px);
+        }
 
         /* --- MODAL BETTING --- */
-        #modal-bet { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
-        .bet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        #modal-bet { position: fixed; inset: 0; background: rgba(0,0,0,0.98); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .bet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 85%; }
         .bet-btn { 
-            background: #1a1a1a; border: 2px solid var(--accent); color: white; 
-            padding: 20px; border-radius: 15px; font-size: 20px; font-weight: bold; cursor: pointer;
+            background: #111; border: 2px solid #333; color: white; 
+            padding: 25px 10px; border-radius: 20px; font-size: 22px; font-weight: 900; cursor: pointer;
+            transition: 0.2s;
         }
+        .bet-btn:active { background: var(--accent); border-color: white; transform: scale(0.95); }
 
-        /* COLORS */
-        .c1 { background: radial-gradient(circle at 30% 30%, #ff4d4d, #800); }
-        .c2 { background: radial-gradient(circle at 30% 30%, #4d94ff, #004); }
-        .c3 { background: radial-gradient(circle at 30% 30%, #4dff4d, #040); }
-        .c4 { background: radial-gradient(circle at 30% 30%, #ffff4d, #880); }
-        .c5 { background: radial-gradient(circle at 30% 30%, #ff4dff, #404); }
+        /* COLORS (High Contrast) */
+        .c1 { background: radial-gradient(circle at 35% 35%, #ff0000, #440000); }
+        .c2 { background: radial-gradient(circle at 35% 35%, #0066ff, #001144); }
+        .c3 { background: radial-gradient(circle at 35% 35%, #00ff00, #003300); }
+        .c4 { background: radial-gradient(circle at 35% 35%, #ffff00, #444400); }
+        .c5 { background: radial-gradient(circle at 35% 35%, #ff00ff, #440044); }
     </style>
 </head>
 <body>
 
     <div id="top-bar">
-        <div class="stat-box"><div class="label">Miza</div><div id="display-bet" class="val">0 GD</div></div>
-        <div class="stat-box"><div class="label">Potansyèl (5x)</div><div id="display-win" class="val" style="color:#0f0">0 GD</div></div>
+        <div class="stat-box"><div class="label">MIZA</div><div id="display-bet" class="val">0 GD</div></div>
+        <div class="stat-box"><div class="label">WIN (5X)</div><div id="display-win" class="val" style="color:#0f0">0 GD</div></div>
     </div>
 
     <div id="timer-cont"><div id="timer-bar"></div></div>
@@ -62,8 +71,8 @@
     <div id="game-board"></div>
 
     <div id="modal-bet">
-        <h2 style="color:var(--accent)">CHWAZI MIZA W</h2>
-        <p>Genyen 5 fwa miza w si w fini a tan!</p>
+        <h1 style="color:var(--accent); font-size: 32px; margin-bottom: 5px;">EROBLACK</h1>
+        <p style="color:#888; margin-bottom: 30px;">SORTING CHALLENGE: 5X WIN</p>
         <div class="bet-grid">
             <button class="bet-btn" onclick="startBet(5)">5 GD</button>
             <button class="bet-btn" onclick="startBet(10)">10 GD</button>
@@ -74,7 +83,7 @@
 
     <script>
         let currentBet = 0;
-        let timeLeft = 100;
+        let timeLeft = 0;
         let gameActive = false;
         let tubesData = [];
         let selectedIndex = null;
@@ -91,31 +100,38 @@
             document.getElementById('display-bet').innerText = amount + " GD";
             document.getElementById('display-win').innerText = (amount * 5) + " GD";
             document.getElementById('modal-bet').style.display = 'none';
-            
-            // Voye kòb la nan Sketchware (Miza)
             sendToSketchware("peye", amount);
             
-            setupLevel(amount);
+            // Tout nivo se menm difikilte (5 koulè, melanje nèt)
+            setupHardLevel();
             startGame();
         }
 
-        function setupLevel(bet) {
-            // Plis kòb la gwo, se plis gen koulè ak mwens tib vid
-            if (bet <= 10) {
-                tubesData = [['c1','c2','c1','c2'], ['c2','c1','c2','c1'], [], []];
-                timeLeft = 45; // 45 segonn
-            } else if (bet <= 25) {
-                tubesData = [['c1','c2','c3','c1'], ['c3','c1','c2','c3'], ['c2','c3','c1','c2'], [], []];
-                timeLeft = 60;
-            } else {
-                // Nivo 100 GD (Trè difisil)
-                tubesData = [
-                    ['c1','c5','c2','c3'], ['c4','c1','c5','c2'], 
-                    ['c3','c4','c1','c5'], ['c2','c3','c4','c1'],
-                    ['c5','c2','c3','c4'], [], []
-                ];
-                timeLeft = 90;
+        function setupHardLevel() {
+            // Melanje 5 koulè nan 5 tib, ak sèlman 2 tib vid pou manevwe
+            const allBalls = [
+                'c1','c1','c1','c1', 'c2','c2','c2','c2', 
+                'c3','c3','c3','c3', 'c4','c4','c4','c4', 
+                'c5','c5','c5','c5'
+            ];
+            
+            // Shuffling algorithm
+            for (let i = allBalls.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allBalls[i], allBalls[j]] = [allBalls[j], allBalls[i]];
             }
+
+            tubesData = [[], [], [], [], [], [], []];
+            for (let i = 0; i < 20; i++) {
+                tubesData[Math.floor(i / 4)].push(allBalls[i]);
+            }
+
+            // TAN LIMIT: Se sèl sa k chanje selon miza a (Mwens tan = Plis difisil)
+            if (currentBet == 5) timeLeft = 50;
+            else if (currentBet == 10) timeLeft = 45;
+            else if (currentBet == 25) timeLeft = 40;
+            else timeLeft = 35; // 100 GD gen sèlman 35 segonn!
+            
             render();
         }
 
@@ -127,9 +143,7 @@
                 let percent = (timeLeft / initialTime) * 100;
                 document.getElementById('timer-bar').style.width = percent + "%";
 
-                if (timeLeft <= 0) {
-                    gameOver("TAN FINI! OU PÈDI.");
-                }
+                if (timeLeft <= 0) gameOver("TAN FINI! OU PÈDI.");
             }, 100);
         }
 
@@ -164,9 +178,11 @@
         function moveBall(from, to) {
             const f = tubesData[from];
             const t = tubesData[to];
-            const ball = f[f.length - 1];
-            if (t.length < 4 && (t.length === 0 || t[t.length-1] === ball)) {
-                t.push(f.pop());
+            if (t.length < 4) {
+                const ball = f[f.length - 1];
+                if (t.length === 0 || t[t.length - 1] === ball) {
+                    t.push(f.pop());
+                }
             }
         }
 
@@ -174,7 +190,7 @@
             const win = tubesData.every(tube => 
                 tube.length === 0 || (tube.length === 4 && tube.every(b => b === tube[0]))
             );
-            if (win) {
+            if (win && tubesData.some(t => t.length > 0)) {
                 gameActive = false;
                 clearInterval(timerInterval);
                 let winAmount = currentBet * 5;

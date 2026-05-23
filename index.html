@@ -1,52 +1,93 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="ht">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mon Site Web</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(120deg, #4facfe, #00f2fe);
-      color: #fff;
-      text-align: center;
-    }
-    header {
-      padding: 50px 20px;
-    }
-    h1 {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 18px;
-      opacity: 0.9;
-    }
-    .btn {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 12px 25px;
-      background: #fff;
-      color: #333;
-      border-radius: 25px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    footer {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      font-size: 14px;
-      opacity: 0.8;
-    }
-  </style>
+    <style>
+        #game-container {
+            width: 350px;
+            height: 500px;
+            background: #111;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #333;
+        }
+        
+        /* Jwè a (Canon an) */
+        #player-launcher {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #ff4500;
+            border-radius: 50% 50% 0 0;
+            z-index: 100;
+        }
+
+        /* Boul ki prale a */
+        .bubble {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
-<body>  <header>
-    <h1>Byenveni sou sit mwen</h1>
-    <p>Mwen kreye sit sa ak HTML + CSS</p>
-    <a class="btn" href="#">Klike la</a>
-  </header>  <footer>
-    © 2026 - Sit pèsonèl mwen
-  </footer></body>
+<body>
+
+<div id="game-container">
+    <div id="player-launcher"></div>
+</div>
+
+<script>
+    const container = document.getElementById('game-container');
+    const launcher = document.getElementById('player-launcher');
+
+    // Koute kote itilizatè a klike pou tire
+    container.addEventListener('click', (e) => {
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        shootBubble(clickX, clickY);
+    });
+
+    function shootBubble(targetX, targetY) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.style.background = 'cyan'; // Koulè boul la
+        
+        // Pozisyon depa (nan bouch canon an)
+        let posX = 160; 
+        let posY = 440;
+        
+        bubble.style.left = posX + 'px';
+        bubble.style.top = posY + 'px';
+        container.appendChild(bubble);
+
+        // Kalkile direksyon an
+        const angle = Math.atan2(targetY - posY, targetX - posX);
+        const speed = 10;
+        const velX = Math.cos(angle) * speed;
+        const velY = Math.sin(angle) * speed;
+
+        // Animasyon boul la
+        const move = setInterval(() => {
+            posX += velX;
+            posY += velY;
+            
+            bubble.style.left = posX + 'px';
+            bubble.style.top = posY + 'px';
+
+            // Si boul la soti deyò oswa li rive anlè
+            if (posY < 0 || posX < 0 || posX > 350) {
+                clearInterval(move);
+                bubble.remove();
+            }
+        }, 20);
+    }
+</script>
+
+</body>
 </html>

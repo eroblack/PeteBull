@@ -3,190 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Eroblack Ball Sort Puzzle</title>
+    <title>Eroblack Ball Betting</title>
     <style>
-        :root {
-            --bg-color: #050a14;
-            --tube-border: rgba(255, 255, 255, 0.2);
-            --selected-color: #00f2ff;
-        }
-
+        :root { --accent: #ffd700; --bg: #050a14; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+        body { 
+            background: var(--bg); color: white; font-family: sans-serif; 
+            margin: 0; display: flex; flex-direction: column; align-items: center; 
+            height: 100vh; overflow: hidden;
         }
 
-        .header { margin-bottom: 20px; text-align: center; }
-        .level-tag { background: #1a1a1a; padding: 5px 20px; border-radius: 20px; border: 1px solid #333; font-weight: bold; }
+        /* --- UI TOP --- */
+        #top-bar { width: 100%; padding: 15px; display: flex; justify-content: space-around; background: #111; border-bottom: 2px solid #333; }
+        .stat-box { text-align: center; }
+        .label { font-size: 10px; color: var(--accent); text-transform: uppercase; }
+        .val { font-size: 18px; font-weight: bold; }
 
-        #game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding: 20px;
-            max-width: 400px;
-        }
+        /* --- TIMER BAR --- */
+        #timer-cont { width: 90%; height: 8px; background: #222; margin: 15px 0; border-radius: 10px; overflow: hidden; }
+        #timer-bar { width: 100%; height: 100%; background: linear-gradient(to right, #00ff00, #ff0000); transition: 0.1s; }
 
+        /* --- GAME BOARD --- */
+        #game-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px; }
         .tube {
-            width: 55px;
-            height: 170px;
-            border: 3px solid var(--tube-border);
-            border-top: none;
-            border-radius: 0 0 30px 30px;
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            padding-bottom: 10px;
-            cursor: pointer;
-            position: relative;
-            background: rgba(255, 255, 255, 0.03);
-            transition: 0.3s;
+            width: 50px; height: 160px; border: 3px solid rgba(255,255,255,0.2);
+            border-top: none; border-radius: 0 0 25px 25px;
+            display: flex; flex-direction: column-reverse; align-items: center;
+            padding-bottom: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .tube.selected { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 15px var(--accent); }
+        .ball { width: 38px; height: 38px; border-radius: 50%; margin-bottom: 2px; box-shadow: inset -4px -4px 8px rgba(0,0,0,0.5); }
+
+        /* --- MODAL BETTING --- */
+        #modal-bet { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .bet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .bet-btn { 
+            background: #1a1a1a; border: 2px solid var(--accent); color: white; 
+            padding: 20px; border-radius: 15px; font-size: 20px; font-weight: bold; cursor: pointer;
         }
 
-        .tube.selected {
-            border-color: var(--selected-color);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
-            transform: translateY(-10px);
-        }
-
-        .ball {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            margin-bottom: 3px;
-            box-shadow: inset -6px -6px 12px rgba(0,0,0,0.4), inset 6px 6px 12px rgba(255,255,255,0.2);
-        }
-
-        /* Ball Colors (3D Gradient) */
-        .red { background: radial-gradient(circle at 35% 35%, #ff5f5f, #8b0000); }
-        .blue { background: radial-gradient(circle at 35% 35%, #5facff, #003366); }
-        .purple { background: radial-gradient(circle at 35% 35%, #e05fff, #4b0082); }
-        .green { background: radial-gradient(circle at 35% 35%, #63ff5f, #004d00); }
-        .yellow { background: radial-gradient(circle at 35% 35%, #fffb5f, #8b8000); }
-
-        .controls { margin-top: 30px; display: flex; gap: 15px; }
-        .btn {
-            background: #1a1a1a; border: 1px solid #444; color: white;
-            padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;
-        }
-        
-        #win-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
-        }
+        /* COLORS */
+        .c1 { background: radial-gradient(circle at 30% 30%, #ff4d4d, #800); }
+        .c2 { background: radial-gradient(circle at 30% 30%, #4d94ff, #004); }
+        .c3 { background: radial-gradient(circle at 30% 30%, #4dff4d, #040); }
+        .c4 { background: radial-gradient(circle at 30% 30%, #ffff4d, #880); }
+        .c5 { background: radial-gradient(circle at 30% 30%, #ff4dff, #404); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="level-tag">LEVEL 393</div>
+    <div id="top-bar">
+        <div class="stat-box"><div class="label">Miza</div><div id="display-bet" class="val">0 GD</div></div>
+        <div class="stat-box"><div class="label">Potansyèl (5x)</div><div id="display-win" class="val" style="color:#0f0">0 GD</div></div>
     </div>
+
+    <div id="timer-cont"><div id="timer-bar"></div></div>
 
     <div id="game-board"></div>
 
-    <div class="controls">
-        <button class="btn" onclick="resetGame()">RESET</button>
-        <button class="btn" onclick="undoMove()">UNDO</button>
-    </div>
-
-    <div id="win-modal">
-        <h1 style="color: #00f2ff;">COMPLETED!</h1>
-        <button class="btn" style="background: #00f2ff; color: #000;" onclick="location.reload()">NEXT LEVEL</button>
+    <div id="modal-bet">
+        <h2 style="color:var(--accent)">CHWAZI MIZA W</h2>
+        <p>Genyen 5 fwa miza w si w fini a tan!</p>
+        <div class="bet-grid">
+            <button class="bet-btn" onclick="startBet(5)">5 GD</button>
+            <button class="bet-btn" onclick="startBet(10)">10 GD</button>
+            <button class="bet-btn" onclick="startBet(25)">25 GD</button>
+            <button class="bet-btn" onclick="startBet(100)">100 GD</button>
+        </div>
     </div>
 
     <script>
-        const gameBoard = document.getElementById('game-board');
-        const winModal = document.getElementById('win-modal');
-        
-        // Konfigirasyon nivo a
-        let tubesData = [
-            ['red', 'blue', 'purple', 'green'],
-            ['green', 'red', 'blue', 'purple'],
-            ['purple', 'green', 'red', 'blue'],
-            ['blue', 'purple', 'green', 'red'],
-            ['yellow', 'yellow', 'yellow', 'yellow'],
-            [], [] // Tib vid
-        ];
-
+        let currentBet = 0;
+        let timeLeft = 100;
+        let gameActive = false;
+        let tubesData = [];
         let selectedIndex = null;
-        let history = [];
+        let timerInterval;
 
-        function initGame() {
-            gameBoard.innerHTML = '';
+        function sendToSketchware(bwat, val) {
+            if (window.Android && window.Android.voyeKòb) {
+                window.Android.voyeKòb(bwat, val.toString());
+            }
+        }
+
+        function startBet(amount) {
+            currentBet = amount;
+            document.getElementById('display-bet').innerText = amount + " GD";
+            document.getElementById('display-win').innerText = (amount * 5) + " GD";
+            document.getElementById('modal-bet').style.display = 'none';
+            
+            // Voye kòb la nan Sketchware (Miza)
+            sendToSketchware("peye", amount);
+            
+            setupLevel(amount);
+            startGame();
+        }
+
+        function setupLevel(bet) {
+            // Plis kòb la gwo, se plis gen koulè ak mwens tib vid
+            if (bet <= 10) {
+                tubesData = [['c1','c2','c1','c2'], ['c2','c1','c2','c1'], [], []];
+                timeLeft = 45; // 45 segonn
+            } else if (bet <= 25) {
+                tubesData = [['c1','c2','c3','c1'], ['c3','c1','c2','c3'], ['c2','c3','c1','c2'], [], []];
+                timeLeft = 60;
+            } else {
+                // Nivo 100 GD (Trè difisil)
+                tubesData = [
+                    ['c1','c5','c2','c3'], ['c4','c1','c5','c2'], 
+                    ['c3','c4','c1','c5'], ['c2','c3','c4','c1'],
+                    ['c5','c2','c3','c4'], [], []
+                ];
+                timeLeft = 90;
+            }
+            render();
+        }
+
+        function startGame() {
+            gameActive = true;
+            const initialTime = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                let percent = (timeLeft / initialTime) * 100;
+                document.getElementById('timer-bar').style.width = percent + "%";
+
+                if (timeLeft <= 0) {
+                    gameOver("TAN FINI! OU PÈDI.");
+                }
+            }, 100);
+        }
+
+        function render() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
             tubesData.forEach((tube, index) => {
-                const tubeDiv = document.createElement('div');
-                tubeDiv.className = `tube ${selectedIndex === index ? 'selected' : ''}`;
-                tubeDiv.onclick = () => handleTubeClick(index);
-
-                tube.forEach(color => {
-                    const ball = document.createElement('div');
-                    ball.className = `ball ${color}`;
-                    tubeDiv.appendChild(ball);
+                const div = document.createElement('div');
+                div.className = `tube ${selectedIndex === index ? 'selected' : ''}`;
+                div.onclick = () => handleTubeClick(index);
+                tube.forEach(c => {
+                    const b = document.createElement('div');
+                    b.className = `ball ${c}`;
+                    div.appendChild(b);
                 });
-                gameBoard.appendChild(tubeDiv);
+                board.appendChild(div);
             });
-            checkWin();
         }
 
         function handleTubeClick(index) {
+            if (!gameActive) return;
             if (selectedIndex === null) {
-                if (tubesData[index].length > 0) {
-                    selectedIndex = index;
-                }
+                if (tubesData[index].length > 0) selectedIndex = index;
             } else {
-                if (selectedIndex === index) {
-                    selectedIndex = null;
-                } else {
-                    moveBall(selectedIndex, index);
-                    selectedIndex = null;
-                }
+                if (selectedIndex !== index) moveBall(selectedIndex, index);
+                selectedIndex = null;
             }
-            initGame();
+            render();
+            checkWin();
         }
 
         function moveBall(from, to) {
-            const fromTube = tubesData[from];
-            const toTube = tubesData[to];
-            const ball = fromTube[fromTube.length - 1];
-
-            if (toTube.length < 4 && (toTube.length === 0 || toTube[toTube.length - 1] === ball)) {
-                history.push(JSON.parse(JSON.stringify(tubesData))); // Save for Undo
-                toTube.push(fromTube.pop());
+            const f = tubesData[from];
+            const t = tubesData[to];
+            const ball = f[f.length - 1];
+            if (t.length < 4 && (t.length === 0 || t[t.length-1] === ball)) {
+                t.push(f.pop());
             }
-        }
-
-        function undoMove() {
-            if (history.length > 0) {
-                tubesData = history.pop();
-                initGame();
-            }
-        }
-
-        function resetGame() {
-            location.reload();
         }
 
         function checkWin() {
-            const isWon = tubesData.every(tube => {
-                return tube.length === 0 || (tube.length === 4 && tube.every(b => b === tube[0]));
-            });
-            
-            if (isWon && tubesData.some(t => t.length > 0)) {
-                setTimeout(() => winModal.style.display = 'flex', 500);
+            const win = tubesData.every(tube => 
+                tube.length === 0 || (tube.length === 4 && tube.every(b => b === tube[0]))
+            );
+            if (win) {
+                gameActive = false;
+                clearInterval(timerInterval);
+                let winAmount = currentBet * 5;
+                sendToSketchware("genyen", winAmount);
+                alert("BRAVO! OU GENYEN " + winAmount + " GD!");
+                location.reload();
             }
         }
 
-        initGame();
+        function gameOver(msg) {
+            gameActive = false;
+            clearInterval(timerInterval);
+            alert(msg);
+            location.reload();
+        }
     </script>
 </body>
 </html>
